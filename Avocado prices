@@ -1,0 +1,75 @@
+import pandas as pd
+
+df=pd.read_csv("/content/avocado.csv")
+
+df.head()
+
+print(df.describe())
+
+print(df.isnull().sum())
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.histplot(df['AveragePrice'], bins=20)
+plt.title('Distribution of Avocado Prices')
+plt.xlabel('Average Price')
+plt.ylabel('Frequency')
+plt.show()
+
+df['Date'] = pd.to_datetime(df['Date'])
+
+df['Date'] = pd.to_datetime(df['Date'])
+
+df.head()
+
+df['Month'] = df['Date'].dt.month
+df['Year'] = df['Date'].dt.year
+
+sns.lineplot(x='Date', y='AveragePrice', data=df)
+plt.title('Average Avocado Price Over Time')
+plt.xlabel('Date')
+plt.ylabel('Average Price')
+plt.show()
+
+sns.barplot(x='region', y='AveragePrice', data=df)
+plt.title('Average Avocado Price by Region')
+plt.xlabel('Region')
+plt.ylabel('Average Price')
+plt.xticks(rotation=90)
+plt.show()
+
+
+sns.barplot(x='type', y='AveragePrice', data=df)
+plt.title('Average Avocado Price by Type')
+plt.xlabel('Type')
+plt.ylabel('Average Price')
+plt.xticks(rotation=90)
+plt.show()
+
+df['type'] = pd.get_dummies(df['type'], drop_first=True)
+
+region_dummies = pd.get_dummies(df['region'], drop_first=True)
+df = pd.concat([df, region_dummies], axis=1)
+
+df.drop(['Date', 'region'], axis=1, inplace=True)
+
+df.head()
+
+X = df.drop('AveragePrice', axis=1)
+y = df['AveragePrice']
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+
+predictions = model.predict(X_test)
+
+mse = mean_squared_error(y_test, predictions)
+print("Mean Squared Error:", mse)
